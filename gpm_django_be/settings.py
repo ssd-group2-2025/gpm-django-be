@@ -33,22 +33,36 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # thirt-pary
+    'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'drf_yasg',
+    # local apps
     'core',
-    'django_restframework'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'gpm_django_be.urls'
@@ -56,7 +70,7 @@ ROOT_URLCONF = 'gpm_django_be.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,6 +94,81 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# RESTFRAMEWORK
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
+# AUTH
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_SIGNUP_FIELDS = [
+    "username*",
+    "email*",
+    "password1*",
+    "password2*",
+]
+
+ACCOUNT_LOGIN_METHODS = ["username", "email"]
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    # This is about session auth
+    # JWT with authorization header doesn't need it
+]
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS += [
+        'http://localhost:8100',
+    ]
+
+# CORS config
+CORS_ALLOWED_ORIGINS = [
+    # Production urls
+    # ...
+]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        # dev servers
+        'http://localhost:8100',
+    ]
+
+# Not needed for token auth
+CORS_ALLOW_CREDENTIALS = False
+
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'origin',
+    'user-agent',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 
 # Password validation
