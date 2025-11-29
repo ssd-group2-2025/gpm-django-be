@@ -1,9 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .validators import validate_https_hostname
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 class User(AbstractUser):
+    matricola = models.CharField(
+        verbose_name='Matricola',
+        unique=True,
+        null=False,
+        validators=[RegexValidator(r'^\d{6}$', "La matricola deve avere 6 cifre numeriche")]
+    )
+
     group = models.ForeignKey(
         "Group",
         on_delete=models.PROTECT,
