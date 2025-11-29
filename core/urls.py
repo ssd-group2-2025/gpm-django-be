@@ -1,5 +1,8 @@
-from django.urls import path
+from rest_framework.routers import SimpleRouter
+from .views import GroupViewSet
 
-urlpatterns = [
-    # path("v1/ai-report/", lambda x: x, name="ai-report"),
-]
+router = SimpleRouter()
+
+router.register('group', GroupViewSet, basename='group')
+
+urlpatterns = router.urls
