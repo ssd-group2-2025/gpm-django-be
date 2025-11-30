@@ -254,5 +254,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_AUTH = {
-    "REGISTER_SERIALIZER": "core.serializers.UserRegisterSerializer",
+    'USER_DETAILS_SERIALIZER': 'core.serializers.UserSerializer',
+    'REGISTER_SERIALIZER': 'core.serializers.UserRegisterSerializer',
 }
