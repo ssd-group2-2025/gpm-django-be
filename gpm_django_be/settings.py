@@ -188,8 +188,12 @@ if DEBUG:
         "http://localhost:8100",
     ]
 
-# Not needed for token auth
-CORS_ALLOW_CREDENTIALS = False
+CORS_ALLOWED_ORIGINS += [
+    "http://localhost:4200",
+]
+
+
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_HEADERS = [
     'accept',
@@ -197,6 +201,7 @@ CORS_ALLOWED_HEADERS = [
     'content-type',
     'origin',
     'user-agent',
+    'x-csrftoken',  # Add this for CSRF token
 ]
 
 CORS_ALLOW_METHODS = [
