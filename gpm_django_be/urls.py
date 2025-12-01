@@ -26,9 +26,10 @@ urlpatterns = [
     path('api/schema/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     # Auth
-   #  path('api-auth/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
     path('api/v1/auth/', include('dj_rest_auth.urls')),
     path('api/v1/auth/registration/', include('dj_rest_auth.registration.urls')),
-    # Core
-    path('api/v1/', include("core.urls"))
+    # Group Projects
+    path('api/v1/', include("group_projects.urls")),
+    path('api/v1/', include("users.urls"))
 ]

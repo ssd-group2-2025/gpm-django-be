@@ -2,12 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Group, User, Topic, Goal, GroupGoals
+from .models import GroupProject, Topic, Goal, GroupGoal, UserGroup
 from .serializers import (
-    GroupSerializer, UserSerializer, TopicSerializer, 
-    GoalSerializer, GroupGoalsSerializer
+    GroupProjectSerializer, TopicSerializer, 
+    GoalSerializer, GroupGoalsSerializer, UserGroupSerializer
 )
-from .permissions import IsAdminOrOwnerGroup, IsAdminOrReadOnly
+from .permissions import IsAdminOrOwnerGroup
 
 
 class TopicViewSet(viewsets.ModelViewSet):
@@ -32,9 +32,9 @@ class GoalViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated(), IsAdminUser()]
 
 
-class GroupViewSet(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+class GroupProjectViewSet(viewsets.ModelViewSet):
+    queryset = GroupProject.objects.all()
+    serializer_class = GroupProjectSerializer
     
     def get_permissions(self):
         """
@@ -69,13 +69,13 @@ class GroupViewSet(viewsets.ModelViewSet):
         user.save()
         
         return Response(
-            {'status': 'Sei entrato nel gruppo', 'group': GroupSerializer(group).data},
+            {'status': 'Sei entrato nel gruppo', 'group': GroupProjectSerializer(group).data},
             status=status.HTTP_200_OK
         )
 
 
-class GroupGoalsViewSet(viewsets.ModelViewSet):
-    queryset = GroupGoals.objects.all()
+class GroupGoalViewSet(viewsets.ModelViewSet):
+    queryset = GroupGoal.objects.all()
     serializer_class = GroupGoalsSerializer
     
     def get_permissions(self):
@@ -85,25 +85,13 @@ class GroupGoalsViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated(), IsAdminUser()]
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-    def get_queryset(self):
-        """Escludi i superuser dalla lista"""
-        queryset = super().get_queryset()
-        if self.action == 'list':
-            return queryset.filter(is_superuser=False)
-        return queryset
+class UserGroupViewset(viewsets.ModelViewSet):
+    queryset = UserGroup.objects.all()
+    serializer_class = UserGroupSerializer
     
     def get_permissions(self):
-        """Admin può modificare, tutti possono visualizzare"""
-        if self.action in ['list', 'retrieve', 'me']:
+        """Solo admin può creare/modificare/eliminare, tutti possono visualizzare"""
+        if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
         return [IsAuthenticated(), IsAdminUser()]
-    
-    @action(detail=False, methods=['get'])
-    def me(self, request):
-        """Ritorna i dati dell'utente corrente"""
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
+

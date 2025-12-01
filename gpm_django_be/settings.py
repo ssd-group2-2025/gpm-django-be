@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     "drf_yasg",
 
     # local apps
-    "core",
+    "users",
+    "group_projects",
 ]
 
 MIDDLEWARE = [
@@ -136,13 +137,12 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
-    ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    ]
 }
 
 
 # AUTH
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'users.User'
 
 SITE_ID = 1
 
@@ -257,6 +257,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_AUTH = {
-    'USER_DETAILS_SERIALIZER': 'core.serializers.UserSerializer',
-    'REGISTER_SERIALIZER': 'core.serializers.UserRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+    'REGISTER_SERIALIZER': 'users.serializers.UserRegisterSerializer',
 }

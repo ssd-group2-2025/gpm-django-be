@@ -1,6 +1,6 @@
 import pytest
 from django.core.exceptions import ValidationError
-from core.validators import validate_https_hostname
+from group_projects.validators import validate_https_hostname
 
 
 def test_validator_accepts_valid_https_url():

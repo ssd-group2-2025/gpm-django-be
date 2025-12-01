@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import User, Topic, Group, Goal, GroupGoals
+from .models import Topic, GroupProject, Goal, GroupGoal
 
 
 class GroupGoalsInline(admin.TabularInline):
-    model = GroupGoals
+    model = GroupGoal
     extra = 0
 
 
-@admin.register(Group)
+@admin.register(GroupProject)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ("name", "topic", "link_django", "link_tui", "link_gui")
     list_filter = ("topic",)
@@ -27,14 +27,8 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
-@admin.register(GroupGoals)
+@admin.register(GroupGoal)
 class GroupGoalsAdmin(admin.ModelAdmin):
     list_display = ("group", "goal", "complete")
     list_filter = ("complete", "group", "goal")
 
-
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ("username", "email", "group", "is_staff")
-    list_filter = ("group", "is_staff")
-    search_fields = ("username", "email")
