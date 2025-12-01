@@ -7,7 +7,7 @@ from .serializers import (
     GroupProjectSerializer, TopicSerializer, 
     GoalSerializer, GroupGoalsSerializer, UserGroupSerializer
 )
-from .permissions import IsAdminOrOwnerGroup
+from .permissions import IsAdminOrMemberGroup
 
 
 class TopicViewSet(viewsets.ModelViewSet):
@@ -39,17 +39,17 @@ class GroupProjectViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         - list/retrieve: tutti gli autenticati
-        - create: solo admin
+        - create: tutti gli autenticati
         - update/partial_update/destroy: admin o owner del gruppo
-        - join: tutti gli autenticati
+        - join/leave: tutti gli autenticati
         """
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
         elif self.action == 'create':
-            return [IsAuthenticated(), IsAdminUser()]
+            return [IsAuthenticated()]  
         elif self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthenticated(), IsAdminOrOwnerGroup()]
-        elif self.action == 'join':
+            return [IsAuthenticated(), IsAdminOrMemberGroup()]
+        elif self.action in ['join', 'leave']:
             return [IsAuthenticated()]
         return [IsAuthenticated()]
     
@@ -59,17 +59,43 @@ class GroupProjectViewSet(viewsets.ModelViewSet):
         group = self.get_object()
         user = request.user
         
-        if user.group:
+        if 'user_id' in request.data and request.data['user_id'] != user.id:
             return Response(
-                {'error': 'Sei già membro di un gruppo'}, 
+                {'error': 'Puoi aggiungere solo te stesso a un gruppo'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+ 
+        if UserGroup.objects.filter(user=user, group=group).exists():
+            return Response(
+                {'error': 'Sei già membro di questo gruppo'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        user.group = group
-        user.save()
+        UserGroup.objects.create(user=user, group=group)
         
         return Response(
             {'status': 'Sei entrato nel gruppo', 'group': GroupProjectSerializer(group).data},
+            status=status.HTTP_200_OK
+        )
+    
+    @action(detail=True, methods=['delete'])
+    def leave(self, request, pk=None):
+        """Permetti a un utente di lasciare un gruppo"""
+        group = self.get_object()
+        user = request.user
+        
+        try:
+            user_group = UserGroup.objects.get(user=user, group=group)
+        except UserGroup.DoesNotExist:
+            return Response(
+                {'error': 'Non sei membro di questo gruppo'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user_group.delete()
+        
+        return Response(
+            {'status': 'Hai lasciato il gruppo'},
             status=status.HTTP_200_OK
         )
 
@@ -90,8 +116,13 @@ class UserGroupViewset(viewsets.ModelViewSet):
     serializer_class = UserGroupSerializer
     
     def get_permissions(self):
-        """Solo admin può creare/modificare/eliminare, tutti possono visualizzare"""
+        """
+        - list/retrieve: tutti gli autenticati
+        - create/update/partial_update: solo admin
+        - destroy: solo admin
+        - leave: l'utente può rimuovere solo se stesso
+        """
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
         return [IsAuthenticated(), IsAdminUser()]
-
+    
