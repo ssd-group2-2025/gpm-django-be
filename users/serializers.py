@@ -1,33 +1,80 @@
+from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from rest_framework.serializers import ModelSerializer, CharField
-from django.core.validators import RegexValidator
-from rest_framework.validators import UniqueValidator
+from dj_rest_auth.serializers import JWTSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
 from .models import User
 
-class UserSerializer(ModelSerializer):
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        
+        # Aggiungi claims custom
+        token['is_staff'] = user.is_staff
+        token['is_superuser'] = user.is_superuser
+        token['email'] = user.email
+        token['username'] = user.username
+        token['first_name'] = user.first_name
+        token['last_name'] = user.last_name
+        token['matricola'] = user.matricola
+        
+        return token
+
+
+class CustomJWTSerializer(JWTSerializer):
+    """Serializer per includere i claims custom nei token JWT"""
+    
+    def get_token(self, obj):
+        print(f"DEBUG obj: {obj}")  # Vediamo cosa arriva
+        print(f"DEBUG type: {type(obj)}")
+        
+        # obj potrebbe essere direttamente l'user
+        user = obj.get('user') if isinstance(obj, dict) else obj
+        
+        # Usa il CustomTokenObtainPairSerializer per generare il token
+        refresh = CustomTokenObtainPairSerializer.get_token(user)
+        return {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }
+
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'matricola']
+        fields = ['id', 'email', 'username', 'first_name', 'last_name', 'matricola']
+        read_only_fields = ['id']
+
 
 class UserRegisterSerializer(RegisterSerializer):
-    first_name = CharField(required=True, min_length=1, max_length=100)
-    last_name = CharField(required=True, min_length=1, max_length=100)
-    matricola = CharField(required=True, validators = [
-        RegexValidator(r'^\d{6}$', "La matricola deve avere 6 cifre numeriche"),
-        UniqueValidator(queryset=User.objects.all(), message="Questa matricola è già utilizzata.")
-    ])
-
+    matricola = serializers.CharField(max_length=6, min_length=6, required=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+    
     def get_cleaned_data(self):
-        data = super().get_cleaned_data()
-        data['first_name'] = self.validated_data.get('first_name', '')
-        data['last_name'] = self.validated_data.get('last_name', '')
-        data['matricola'] = self.validated_data.get('matricola', '')
-        return data
-
+        return {
+            'username': self.validated_data.get('username', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'email': self.validated_data.get('email', ''),
+            'matricola': self.validated_data.get('matricola', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
+        }
+    
     def save(self, request):
-        user = super().save(request)
-        user.first_name = self.validated_data.get('first_name', '')
-        user.last_name = self.validated_data.get('last_name', '')
-        user.matricola = self.validated_data.get('matricola', '')
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+        user = adapter.save_user(request, user, self, commit=False)
+
+        user.matricola = self.cleaned_data.get('matricola')
+        user.first_name = self.cleaned_data.get('first_name', '')
+        user.last_name = self.cleaned_data.get('last_name', '')
+        
         user.save()
+        setup_user_email(request, user, [])
         return user
