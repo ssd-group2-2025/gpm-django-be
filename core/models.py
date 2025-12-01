@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 class User(AbstractUser):
     matricola = models.CharField(
         verbose_name='Matricola',
-        unique=True,
+       # unique=True,
         null=False,
         validators=[RegexValidator(r'^\d{6}$', "La matricola deve avere 6 cifre numeriche")]
     )

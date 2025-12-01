@@ -176,6 +176,9 @@ if DEBUG:
         "http://localhost:8100",
     ]
 
+CSRF_TRUSTED_ORIGINS += [
+    "http://localhost:4200",
+]
 # CORS config
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
