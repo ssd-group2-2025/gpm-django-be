@@ -174,11 +174,9 @@ CSRF_TRUSTED_ORIGINS = [
 if DEBUG:
     CSRF_TRUSTED_ORIGINS += [
         "http://localhost:8100",
+        "http://localhost:4200"
     ]
 
-CSRF_TRUSTED_ORIGINS += [
-    "http://localhost:4200",
-]
 # CORS config
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
@@ -189,11 +187,8 @@ CORS_ALLOWED_ORIGINS = [
 if DEBUG:
     CORS_ALLOWED_ORIGINS += [
         "http://localhost:8100",
+        "http://localhost:4200"
     ]
-
-CORS_ALLOWED_ORIGINS += [
-    "http://localhost:4200",
-]
 
 
 CORS_ALLOW_CREDENTIALS = True
