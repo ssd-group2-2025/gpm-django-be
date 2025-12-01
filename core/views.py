@@ -65,3 +65,9 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Ritorna i dati dell'utente corrente"""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)

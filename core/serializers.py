@@ -28,8 +28,8 @@ class GroupSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'matricola', 'group']
-        read_only_fields = ['id']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'matricola', 'group', 'is_staff', 'is_superuser']
+        read_only_fields = ['id', 'is_staff', 'is_superuser']
 
 class UserRegisterSerializer(RegisterSerializer):
     first_name = CharField(required=True, min_length=1, max_length=100)
