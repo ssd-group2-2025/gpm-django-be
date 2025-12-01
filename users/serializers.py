@@ -13,7 +13,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         
-        # Aggiungi claims custom
         token['is_staff'] = user.is_staff
         token['is_superuser'] = user.is_superuser
         token['email'] = user.email
@@ -26,16 +25,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomJWTSerializer(JWTSerializer):
-    """Serializer per includere i claims custom nei token JWT"""
-    
     def get_token(self, obj):
-        print(f"DEBUG obj: {obj}")  # Vediamo cosa arriva
-        print(f"DEBUG type: {type(obj)}")
-        
-        # obj potrebbe essere direttamente l'user
         user = obj.get('user') if isinstance(obj, dict) else obj
-        
-        # Usa il CustomTokenObtainPairSerializer per generare il token
         refresh = CustomTokenObtainPairSerializer.get_token(user)
         return {
             'access': str(refresh.access_token),
