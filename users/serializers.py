@@ -1,3 +1,5 @@
+from django.forms import ValidationError as DjangoValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import JWTSerializer
@@ -65,7 +67,10 @@ class UserRegisterSerializer(RegisterSerializer):
         user.matricola = self.cleaned_data.get('matricola')
         user.first_name = self.cleaned_data.get('first_name', '')
         user.last_name = self.cleaned_data.get('last_name', '')
-        
+        try:
+            user.full_clean()
+        except DjangoValidationError as ex:
+            raise ValidationError(ex.message_dict)
         user.save()
         setup_user_email(request, user, [])
         return user
