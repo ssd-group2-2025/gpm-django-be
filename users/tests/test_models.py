@@ -16,7 +16,7 @@ def test_user_matricola_must_be_6_digits(db):
     user = mixer.blend('users.User', matricola='12345')
     with pytest.raises(ValidationError) as err:
         user.full_clean()
-    assert 'La matricola deve avere 6 cifre numeriche' in str(err.value)
+    assert 'The matricola must contain exactly 6 digits' in str(err.value)
 
 
 def test_user_matricola_must_be_numeric(db):
@@ -24,7 +24,7 @@ def test_user_matricola_must_be_numeric(db):
     user = mixer.blend('users.User', matricola='abcdef')
     with pytest.raises(ValidationError) as err:
         user.full_clean()
-    assert 'La matricola deve avere 6 cifre numeriche' in str(err.value)
+    assert 'The matricola must contain exactly 6 digits' in str(err.value)
 
 
 def test_user_matricola_must_be_unique(db):
