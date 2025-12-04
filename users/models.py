@@ -8,7 +8,7 @@ class User(AbstractUser):
         unique=True,
         null=False,
         blank=False,
-        validators=[RegexValidator(r'^\d{6}$', "La matricola deve avere 6 cifre numeriche")]
+        validators=[RegexValidator(r'^\d{6}$', "The matricola must contain exactly 6 digits")]
     )
 
     email = models.CharField(
