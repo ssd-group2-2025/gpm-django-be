@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, EmailValidator
 
 class User(AbstractUser):
     matricola = models.CharField(
@@ -9,4 +9,11 @@ class User(AbstractUser):
         null=False,
         blank=False,
         validators=[RegexValidator(r'^\d{6}$', "La matricola deve avere 6 cifre numeriche")]
+    )
+
+    email = models.CharField(
+        unique=True,
+        null=False,
+        blank=False,
+        validators=[EmailValidator()]
     )
