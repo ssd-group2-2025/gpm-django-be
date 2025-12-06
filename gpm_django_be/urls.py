@@ -32,15 +32,18 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
     path('api/schema/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api-auth/', include('rest_framework.urls')),
+    
     path('accounts/login/', auth_views.LoginView.as_view(template_name='rest_framework/login.html'), name='login'),
     path('accounts/logout/', logout_view, name='logout'),
-    path('api/v1/auth/logout/', include('dj_rest_auth.urls')),  # solo per logout
+    
     path('api/v1/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/v1/auth/login/', CustomTokenObtainPairView.as_view(), name='custom_login'),
-    path('api/v1/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/auth/', include('dj_rest_auth.urls')),
+    
     path('api/v1/', include("group_projects.urls")),
     path('api/v1/', include("users.urls"))
 ]
