@@ -1,6 +1,6 @@
 from django.test import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
-from users.serializers import UserSerializer, UserRegisterSerializer
+from users.serializers import CustomJWTSerializer, UserSerializer, UserRegisterSerializer
 from rest_framework.exceptions import ValidationError
 from users.models import User
 import pytest
@@ -257,3 +257,15 @@ def test_unique_matricola_in_user_register_serializer(mock_request):
         u2_serializer.save(mock_request)
 
     assert 'User with this Matricola already exists' in str(ex)
+
+@pytest.mark.django_db
+def test_get_token_from_custom_jwt_serializer():
+    mock_user = User.objects.create_user(username="testuser", email='mail@example.com', password="Sup3rSecur3P4ssw0rd!!", matricola='123456')
+
+    serializer = CustomJWTSerializer()
+    tokens = serializer.get_token(mock_user)
+
+    assert "access" in tokens
+    assert "refresh" in tokens
+    assert isinstance(tokens["access"], str)
+    assert isinstance(tokens["refresh"], str)
