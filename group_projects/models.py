@@ -10,9 +10,9 @@ class Topic(models.Model):
 class GroupProject(models.Model):
     name = models.CharField(max_length=100)
     topic = models.ForeignKey(Topic, on_delete=models.PROTECT, related_name='group_projects')
-    link_django = models.URLField(validators=[validate_https_hostname])
-    link_tui = models.URLField(validators=[validate_https_hostname])
-    link_gui = models.URLField(validators=[validate_https_hostname])
+    link_django = models.URLField(validators=[validate_https_hostname], default='https://example.com', blank=True)
+    link_tui = models.URLField(validators=[validate_https_hostname], default='https://example.com', blank=True)
+    link_gui = models.URLField(validators=[validate_https_hostname], default='https://example.com', blank=True)
 
 class Goal(models.Model):
     title = models.CharField(max_length=100)
