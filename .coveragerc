@@ -1,14 +1,12 @@
 [run]
 omit =
     */migrations/*
-    */permissions.py
     */urls.py
     */admin.py
     */apps.py
     */wsgi.py
     */asgi.py
     */tests/*
-    */views.py
 
 show_missing = true
 skip_covered = true
