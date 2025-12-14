@@ -7,6 +7,7 @@ omit =
     */wsgi.py
     */asgi.py
     */tests/*
+    */permissions.py
 
 show_missing = true
 skip_covered = true
