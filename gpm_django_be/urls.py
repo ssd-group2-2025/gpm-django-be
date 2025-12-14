@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from users.views import CustomTokenObtainPairView
+from users.views import CustomTokenObtainPairView, CustomLogoutView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -39,11 +39,10 @@ urlpatterns = [
     
     path('accounts/login/', auth_views.LoginView.as_view(template_name='rest_framework/login.html'), name='login'),
     path('accounts/logout/', logout_view, name='logout'),
-    
     path('api/v1/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/v1/auth/login/', CustomTokenObtainPairView.as_view(), name='custom_login'),
-    path('api/v1/auth/', include('dj_rest_auth.urls')),
-    
+    path('api/v1/auth/logout/', CustomLogoutView.as_view(), name='custom_logout'),
+    path('api/v1/auth/', include('dj_rest_auth.urls')),  
     path('api/v1/', include("group_projects.urls")),
     path('api/v1/', include("users.urls"))
 ]
